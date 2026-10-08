@@ -1,0 +1,1 @@
+alter table consertos add cor_veiculo varchar(100);
