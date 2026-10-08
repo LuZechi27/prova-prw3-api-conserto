@@ -1,7 +1,5 @@
 package br.edu.ifsp.prw3.prova.conserto;
 
-import jakarta.validation.constraints.NotNull;
-
 public record ConsertoUpdateDTO(
 
         // tirei o id daqui para seguir o padrão PUT path/entidade/id

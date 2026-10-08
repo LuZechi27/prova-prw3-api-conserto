@@ -3,7 +3,6 @@ package br.edu.ifsp.prw3.prova.conserto;
 import br.edu.ifsp.prw3.prova.mecanico.Mecanico;
 import br.edu.ifsp.prw3.prova.veiculo.Veiculo;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
