@@ -5,13 +5,14 @@ API para gerenciamento de consertos de veículos.
 ## Endpoints
 
 | Método   | Endpoint                 | Descrição                                        |
-| -------- | ------------------------ | ------------------------------------------------ |
+| -------- |--------------------------|--------------------------------------------------|
 | `POST`   | `/conserto`              | Cadastra um novo conserto                        |
 | `GET`    | `/conserto`              | Retorna todos os consertos detalhadamente        |
 | `GET`    | `/conserto/simplificado` | Retorna todos os consertos de forma simplificada |
 | `GET`    | `/conserto/:id`          | Retorna um conserto específico                   |
 | `PUT`    | `/conserto/:id`          | Atualiza um conserto                             |
 | `DELETE` | `/conserto/:id`          | Deleta logicamente um conserto                   |
+| `POST`   | `/login`                 | Efetua login                                     |
 
 > **Observação:** nos exemplos abaixo, valores representados por `0` são valores numéricos (`number`/`Integer`), e não strings.
 
@@ -92,7 +93,7 @@ Retorna todos os consertos cadastrados utilizando uma versão simplificada dos d
 
 ### Requisição
 
-```http
+```http request
 GET /conserto/simplificado
 ```
 
@@ -108,7 +109,7 @@ Substitua `:id` pelo ID do conserto desejado.
 
 ### Exemplo
 
-```http
+```http request
 GET /conserto/1
 ```
 
@@ -126,7 +127,7 @@ Substitua `:id` pelo ID do conserto que deseja alterar.
 
 ### Exemplo
 
-```http
+```http request
 PUT /conserto/1
 ```
 
@@ -206,7 +207,7 @@ Substitua `:id` pelo ID do conserto que deseja excluir.
 
 ### Exemplo
 
-```http
+```http request
 DELETE /conserto/1
 ```
 
@@ -228,6 +229,34 @@ Dessa forma, o registro permanece armazenado no banco, mas é considerado inativ
 
 ---
 
+## POST `/login`
+
+Efetua Login para acessar todos os outros recursos.
+
+### Exemplo
+```http request
+POST /login
+```
+
+### Corpo da requisição
+```json
+{
+  "login": "LOGIN",
+  "password": "SENHA"
+}
+```
+
+### Resposta
+
+Se o login e senha estiverem válidos:
+
+```json
+{
+  "token": "token jwt"
+}
+```
+
+---
 ## Formato das datas
 
 As datas devem ser enviadas no formato:
