@@ -1,6 +1,7 @@
 package br.edu.ifsp.prw3.prova.controller;
 
 import br.edu.ifsp.prw3.prova.conserto.*;
+import br.edu.ifsp.prw3.prova.service.ConsertoService;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -18,18 +19,16 @@ import java.util.Optional;
 @RequestMapping("conserto")
 public class ConsertoController {
 
-    private final ConsertoRepository repository;
+    private final ConsertoService service;
 
-    public ConsertoController(ConsertoRepository repository) {
-        this.repository = repository;
+    public ConsertoController(ConsertoService service) {
+        this.service = service;
     }
 
     @PostMapping
     @Transactional
     public ResponseEntity<ConsertoDetailsDTO> create(@RequestBody @Valid ConsertoDTO dto, UriComponentsBuilder uriBuilder) {
-        Conserto conserto = new Conserto(dto);
-        repository.save(conserto);
-
+        Conserto conserto = service.create(dto);
         URI uri = uriBuilder.path("/conserto/{id}").buildAndExpand(conserto.getId()).toUri();
 
         return ResponseEntity.created(uri).body(new ConsertoDetailsDTO(conserto));
@@ -37,27 +36,20 @@ public class ConsertoController {
 
     @GetMapping
     public ResponseEntity<Page<ConsertoDetailsDTO>> getAll(Pageable pageable) {
-        Page<ConsertoDetailsDTO> page = repository.findAllByAtivoTrue(pageable).map(ConsertoDetailsDTO::new);
-
+        Page<ConsertoDetailsDTO> page = service.findAllAtivo(pageable);
         return ResponseEntity.ok(page);
     }
 
     @GetMapping("simplificado")
     public ResponseEntity<List<ConsertoSimplifiedDTO>> getSimplified() {
-        List<ConsertoSimplifiedDTO> response = repository.findAllByAtivoTrue()
-                .stream().map(ConsertoSimplifiedDTO::new).toList();
-
+        List<ConsertoSimplifiedDTO> response = service.findAllSimplified();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ConsertoDetailsDTO> getConsertoById(@PathVariable Long id) {
-        Optional<Conserto> consertoOptional = repository.findById(id);
-
-        if (consertoOptional.isPresent()) {
-            Conserto conserto = consertoOptional.get();
-            return ResponseEntity.ok(new ConsertoDetailsDTO(conserto));
-        } else return ResponseEntity.notFound().build();
+        Optional<ConsertoDetailsDTO> conserto = service.findById(id);
+        return conserto.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
@@ -67,18 +59,14 @@ public class ConsertoController {
             return ResponseEntity.ok(new GenericResponseDTO(
                     "Nenhuma alteração feira, verifique se o corpo da requisição segue o padrão: { dataSaida: x, nomeMecanico: x, anosExperiencia: x } "
             ));
-
-        Conserto conserto = repository.getReferenceById(id);
-        conserto.update(dto);
-
-        return ResponseEntity.ok(new ConsertoDetailsDTO(conserto));
+        ConsertoDetailsDTO conserto = service.update(dto, id);
+        return ResponseEntity.ok(conserto);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<ConsertoDetailsDTO> delete(@PathVariable Long id) {
-        Conserto conserto = repository.getReferenceById(id);
-        conserto.delete();
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
