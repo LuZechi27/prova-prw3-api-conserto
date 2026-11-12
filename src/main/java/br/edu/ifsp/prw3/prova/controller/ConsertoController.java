@@ -4,7 +4,6 @@ import br.edu.ifsp.prw3.prova.conserto.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +18,11 @@ import java.util.Optional;
 @RequestMapping("conserto")
 public class ConsertoController {
 
-    @Autowired
-    private ConsertoRepository repository;
+    private final ConsertoRepository repository;
+
+    public ConsertoController(ConsertoRepository repository) {
+        this.repository = repository;
+    }
 
     @PostMapping
     @Transactional
@@ -61,8 +63,6 @@ public class ConsertoController {
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<?> update(@RequestBody @Valid ConsertoUpdateDTO dto, @PathVariable @NotNull Long id) {
-        if (idIsNotValid(id)) return ResponseEntity.notFound().build();
-
         if (dto.dataSaida() == null && dto.nomeMecanico() == null && dto.anosExperiencia() == null)
             return ResponseEntity.ok(new GenericResponseDTO(
                     "Nenhuma alteração feira, verifique se o corpo da requisição segue o padrão: { dataSaida: x, nomeMecanico: x, anosExperiencia: x } "
@@ -77,14 +77,8 @@ public class ConsertoController {
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<ConsertoDetailsDTO> delete(@PathVariable Long id) {
-        if (idIsNotValid(id)) return ResponseEntity.notFound().build();
-
         Conserto conserto = repository.getReferenceById(id);
         conserto.delete();
         return ResponseEntity.noContent().build();
-    }
-
-    private boolean idIsNotValid(Long id) {
-        return !repository.existsById(id);
     }
 }
